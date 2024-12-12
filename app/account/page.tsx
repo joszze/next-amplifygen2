@@ -7,9 +7,6 @@ export const dynamic = "force-dynamic";
 
 export default async function AuthGetCurrentUserServer() {
   try {
-    if (!(await cookies()).get("amplify-token")) {
-      return <p>You are not logged in</p>;
-    }
     const currentUser = await runWithAmplifyServerContext({
       nextServerContext: { cookies },
       operation: (contextSpec) => getCurrentUser(contextSpec),

@@ -11,7 +11,7 @@ export default async function StaticallyRenderedPage() {
       nextServerContext: null,
       operation: (contextSpec) =>
         getUrl(contextSpec, {
-          path: "/public/splash.png",
+          path: "public/Screenshot 2024-12-11 054357.png",
         }),
     });
 

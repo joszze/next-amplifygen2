@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { runWithAmplifyServerContext } from "@/utils/amplifyServerUtils";
 
 export async function middleware(request: NextRequest) {
-  console.log("middleware says hi");
   const response = NextResponse.next();
 
   const authenticated = await runWithAmplifyServerContext({
@@ -25,7 +24,7 @@ export async function middleware(request: NextRequest) {
   if (authenticated) {
     return response;
   }
-
+  console.log(authenticated);
   return NextResponse.redirect(new URL("/sign-in", request.url));
 }
 
@@ -38,6 +37,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|sign-in).*)",
+    "/account",
   ],
 };
