@@ -10,12 +10,6 @@ const Navbar: FC<{ className?: string }> = ({ className }) => {
           <Link href="/">Home</Link>
         </li>
         <li>
-          <Link href="/account">Account</Link>
-        </li>
-        <li>
-          <Link href="/static-page">Static-Page</Link>
-        </li>
-        <li>
           <Link href="/upload">Upload</Link>
         </li>
       </ul>

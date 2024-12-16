@@ -1,6 +1,8 @@
-import { fetchAuthSession } from "aws-amplify/auth/server";
+// middleware.ts
 import { NextRequest, NextResponse } from "next/server";
-import { runWithAmplifyServerContext } from "@/utils/amplifyServerUtils";
+
+import { fetchAuthSession } from "aws-amplify/auth/server";
+import { runWithAmplifyServerContext } from "./utils/amplifyServerUtils";
 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
@@ -9,23 +11,20 @@ export async function middleware(request: NextRequest) {
     nextServerContext: { request, response },
     operation: async (contextSpec) => {
       try {
-        const session = await fetchAuthSession(contextSpec);
-        return (
-          session.tokens?.accessToken !== undefined &&
-          session.tokens?.idToken !== undefined
-        );
+        const session = await fetchAuthSession(contextSpec, {});
+        return session.tokens !== undefined;
       } catch (error) {
         console.log(error);
         return false;
       }
     },
   });
-
+  console.log(authenticated);
   if (authenticated) {
     return response;
   }
-  console.log(authenticated);
-  return NextResponse.redirect(new URL("/sign-in", request.url));
+
+  return NextResponse.redirect(new URL("/login", request.url));
 }
 
 export const config = {
@@ -36,7 +35,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - login
      */
-    "/account",
+    "/((?!api|_next/static|_next/image|favicon.ico|login).*)",
   ],
 };

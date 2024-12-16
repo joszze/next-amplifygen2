@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import Providers from "./providers";
 import { cn } from "./utils/cn";
 import Header from "./components/Header";
+import ConfigureAmplifyClientSide from "./components/ConfigureAmplify";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,13 +29,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={cn(geistSans.variable, geistMono.variable, "antialiased")}
+        className={cn(
+          geistSans.variable,
+          geistMono.variable,
+          "antialiased",
+          "flex flex-col min-h-screen items-center text-white bg-black"
+        )}
       >
-        <Providers className="flex flex-col justify-between min-h-screen items-center">
-          <Header />
-          <main className="flex-grow">{children}</main>
-          <footer>TODO</footer>
-        </Providers>
+        <ConfigureAmplifyClientSide />
+        <Header />
+        <main className="flex-grow">{children}</main>
+        <footer>TODO</footer>
       </body>
     </html>
   );

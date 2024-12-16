@@ -1,65 +1,39 @@
-"use client";
+import {
+  AuthGetCurrentUserServer,
+  cookiesClient,
+} from "@/utils/amplifyServerUtils";
+import { revalidatePath } from "next/cache";
+import Logout from "./components/Logout";
 
-import { useState, useEffect } from "react";
-import type { Schema } from "@/amplify/data/resource";
-import "@aws-amplify/ui-react/styles.css";
-import { useAuthenticator } from "@aws-amplify/ui-react";
-import { client } from "./providers";
+async function App() {
+  const { data: todos } = await cookiesClient.models.Todo.list();
 
-export default function App() {
-  const { user, signOut } = useAuthenticator();
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
-  const [hello, setHello] = useState<string>("");
-
-  function listTodos() {
-    const a = client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
+  async function addTodo(data: FormData) {
+    "use server";
+    const user = await AuthGetCurrentUserServer();
+    console.log(user);
+    const title = data.get("title") as string;
+    await cookiesClient.models.Todo.create({
+      content: title,
     });
-    console.log(a);
-  }
-
-  useEffect(() => {
-    listTodos();
-    const hey = client.queries.sayHello({ name: "Josz" });
-    console.log("lambda called", hey);
-    hey
-      .then((res) => {
-        console.log(res);
-        setHello("Lambda says " + res.data);
-      })
-      .catch((err) => console.log(err));
-  }, []);
-
-  function createTodo() {
-    client.models.Todo.create({
-      content: window.prompt("Todo content"),
-    });
-  }
-  function deleteTodo(id: string) {
-    client.models.Todo.delete({ id });
+    revalidatePath("/server-component");
   }
 
   return (
-    <main>
-      <h1>{user?.username}</h1>
-      <h1>{hello}</h1>
-      <h1>My todos</h1>
-      <button onClick={createTodo}>+ new</button>
+    <>
+      <h1>Hello, Amplify 👋</h1>
+
+      <form action={addTodo}>
+        <input type="text" name="title" />
+        <button type="submit">Add Todo</button>
+      </form>
+
       <ul>
-        {todos.map((todo) => (
-          <li key={todo.id} onClick={() => deleteTodo(todo.id)}>
-            {todo.content}
-          </li>
-        ))}
+        {todos && todos.map((todo) => <li key={todo.id}>{todo.content}</li>)}
       </ul>
-      <div>
-        🥳 App successfully hosted. Try creating a new todo.
-        <br />
-        <a href="https://docs.amplify.aws/nextjs/start/quickstart/nextjs-app-router-client-components/">
-          Review next steps of this tutorial.
-        </a>
-      </div>
-      <button onClick={signOut}>Sign out</button>
-    </main>
+      <Logout />
+    </>
   );
 }
+
+export default App;
