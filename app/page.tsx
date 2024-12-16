@@ -9,6 +9,7 @@ import { client } from "./providers";
 export default function App() {
   const { user, signOut } = useAuthenticator();
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  const [hello, setHello] = useState<string>("");
 
   function listTodos() {
     const a = client.models.Todo.observeQuery().subscribe({
@@ -19,6 +20,14 @@ export default function App() {
 
   useEffect(() => {
     listTodos();
+    const hey = client.queries.sayHello({ name: "Josz" });
+    console.log("lambda called", hey);
+    hey
+      .then((res) => {
+        console.log(res);
+        setHello("Lambda says " + res.data);
+      })
+      .catch((err) => console.log(err));
   }, []);
 
   function createTodo() {
@@ -32,7 +41,8 @@ export default function App() {
 
   return (
     <main>
-      <h1>{user?.signInDetails?.authFlowType}</h1>
+      <h1>{user?.username}</h1>
+      <h1>{hello}</h1>
       <h1>My todos</h1>
       <button onClick={createTodo}>+ new</button>
       <ul>
